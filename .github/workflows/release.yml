@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  release-assets:
+  release:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,122 +21,33 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Validate tag matches project version
+        run: |
+          version="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          test "${GITHUB_REF_NAME}" = "v${version}"
+
       - name: Build Python distributions
         run: |
           python -m pip install --upgrade build
           python -m build
 
-      - name: Prepare Arch release assets
+      - name: Build tagged source archive
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-          mkdir -p dist/release
-          mkdir -p dist/release/python
           git archive \
             --format=tar.gz \
             --prefix="vomacsd-${VERSION}/" \
             "${GITHUB_REF_NAME}" \
-            -o "dist/release/vomacsd-${VERSION}.tar.gz"
-          SHA256="$(sha256sum "dist/release/vomacsd-${VERSION}.tar.gz" | awk '{print $1}')"
-          python3 packaging/arch/render_pkgbuild.py \
-            --template packaging/arch/PKGBUILD.in \
-            --output dist/release/PKGBUILD \
-            --version "$VERSION" \
-            --repository "$GITHUB_REPOSITORY" \
-            --source-url "https://github.com/${GITHUB_REPOSITORY}/releases/download/v${VERSION}/vomacsd-${VERSION}.tar.gz" \
-            --source-sha256 "$SHA256"
-          python3 packaging/arch/render_pkgbuild.py \
-            --template packaging/arch/PKGBUILD.local.in \
-            --output dist/release/PKGBUILD.local \
-            --version "$VERSION" \
-            --repository "$GITHUB_REPOSITORY" \
-            --source-url "vomacsd-${VERSION}.tar.gz" \
-            --source-sha256 "$SHA256"
-          cp packaging/arch/vomacsd.install dist/release/vomacsd.install
-          cp dist/*.whl dist/release/python/
-
-      - name: Upload release preparation artifacts
-        uses: actions/upload-artifact@v6
-        with:
-          name: release-assets
-          path: dist/release
-
-  arch-package:
-    runs-on: ubuntu-latest
-    needs: release-assets
-    container:
-      image: archlinux:latest
-
-    steps:
-      - name: Install Arch packaging toolchain
-        run: |
-          pacman -Syu --noconfirm
-          pacman -S --noconfirm --needed \
-            base-devel \
-            python \
-            python-build \
-            python-installer \
-            python-setuptools \
-            python-wheel \
-            python-websocket-client \
-            ffmpeg \
-            libnotify
-
-      - uses: actions/download-artifact@v6
-        with:
-          name: release-assets
-          path: /tmp/release-assets
-
-      - name: Build Arch package and .SRCINFO
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          BUILD_ROOT="/tmp/makepkg"
-          mkdir -p "$BUILD_ROOT"
-          cp /tmp/release-assets/vomacsd-${VERSION}.tar.gz "$BUILD_ROOT/"
-          cp /tmp/release-assets/vomacsd.install "$BUILD_ROOT/"
-          cp /tmp/release-assets/PKGBUILD.local "$BUILD_ROOT/PKGBUILD"
-          useradd -m builder
-          chown -R builder:builder "$BUILD_ROOT"
-          runuser -u builder -- sh -lc "cd '$BUILD_ROOT' && makepkg --noconfirm --cleanbuild --clean"
-          cp /tmp/release-assets/PKGBUILD "$BUILD_ROOT/PKGBUILD.release"
-          chown builder:builder "$BUILD_ROOT/PKGBUILD.release"
-          runuser -u builder -- sh -lc "cd '$BUILD_ROOT' && cp PKGBUILD.release PKGBUILD && makepkg --printsrcinfo > .SRCINFO"
-          mkdir -p /tmp/arch-release
-          cp "$BUILD_ROOT"/vomacsd-*.pkg.tar.zst /tmp/arch-release/
-          cp "$BUILD_ROOT"/.SRCINFO /tmp/arch-release/SRCINFO
-
-      - name: Upload Arch packaging artifacts
-        uses: actions/upload-artifact@v6
-        with:
-          name: arch-package
-          path: |
-            /tmp/arch-release/vomacsd-*.pkg.tar.zst
-            /tmp/arch-release/SRCINFO
-
-  github-release:
-    runs-on: ubuntu-latest
-    needs:
-      - release-assets
-      - arch-package
-
-    steps:
-      - uses: actions/download-artifact@v6
-        with:
-          name: release-assets
-          path: dist/release
-
-      - uses: actions/download-artifact@v6
-        with:
-          name: arch-package
-          path: dist/arch
+            -o "dist/vomacsd-${VERSION}.tar.gz"
+          (
+            cd dist
+            sha256sum "vomacsd-${VERSION}.tar.gz" > SHA256SUMS
+          )
 
       - name: Publish GitHub release assets
         uses: softprops/action-gh-release@v2.4.2
         with:
           files: |
-            dist/release/vomacsd-*.tar.gz
-            dist/release/PKGBUILD
-            dist/release/vomacsd.install
-            dist/release/python/*.whl
-            dist/arch/vomacsd-*.pkg.tar.zst
-            dist/arch/SRCINFO
+            dist/*.tar.gz
+            dist/*.whl
+            dist/SHA256SUMS

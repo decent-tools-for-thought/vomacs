@@ -4,7 +4,4 @@ dist/
 build/
 *.egg-info/
 __pycache__/
-src/
-pkg/
-*.pkg.tar.zst
-*.pkg.tar.zst.sig
+.venv/

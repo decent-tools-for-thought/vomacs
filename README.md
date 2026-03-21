@@ -30,61 +30,40 @@ to output commands and hooks. The daemon does not pretend that `Ctrl+V` is unive
 
 ## Commands
 
+Set up the repo with `uv`:
+
+```bash
+uv sync
+uv run vomacsd --help
+```
+
 Start the daemon:
 
 ```bash
-PYTHONPATH=python-src python3 -m vomacsd init-config
-PYTHONPATH=python-src python3 -m vomacsd serve
+uv run python -m vomacsd init-config
+uv run python -m vomacsd serve
 ```
 
 Control it from another shell:
 
 ```bash
-PYTHONPATH=python-src python3 -m vomacsd status
-PYTHONPATH=python-src python3 -m vomacsd start
-PYTHONPATH=python-src python3 -m vomacsd stop
-PYTHONPATH=python-src python3 -m vomacsd toggle
-PYTHONPATH=python-src python3 -m vomacsd cancel
-PYTHONPATH=python-src python3 -m vomacsd reload
+uv run python -m vomacsd status
+uv run python -m vomacsd start
+uv run python -m vomacsd stop
+uv run python -m vomacsd toggle
+uv run python -m vomacsd cancel
+uv run python -m vomacsd reload
 ```
 
 There is also a user-service template at [contrib/vomacsd.service](/home/morty/Software/vomacs/contrib/vomacsd.service).
 
-## Arch install
+## Release assets
 
-The release flow now targets Arch installation in two ways:
+Tagging `v<version>` publishes release artifacts from the tagged commit on GitHub:
 
-- a prebuilt `vomacsd-<version>-1-any.pkg.tar.zst` package asset on each GitHub release
-- release source assets for manual `makepkg` builds:
-  - a release source tarball
-  - a rendered `PKGBUILD`
-  - a rendered `SRCINFO`
-  - `vomacsd.install`
-
-For the normal install path on Arch, download the package asset from the GitHub release and install it:
-
-```bash
-sudo pacman -U ./vomacsd-<version>-1-any.pkg.tar.zst
-systemctl --user daemon-reload
-systemctl --user enable --now vomacsd.service
-```
-
-If you prefer to build from the release metadata instead:
-
-```bash
-makepkg -si
-systemctl --user daemon-reload
-systemctl --user enable --now vomacsd.service
-```
-
-For local builds from this repo checkout, the root now includes a ready-to-run `PKGBUILD` and `SRCINFO`, so you can do:
-
-```bash
-cd /home/morty/Software/vomacs
-env PATH=/usr/bin:/bin makepkg -si
-```
-
-The `PATH` prefix matters on machines where conda is ahead of `/usr/bin`, because `makepkg` should use Arch's system Python toolchain rather than a conda Python.
+- `vomacsd-<version>.tar.gz`
+- `vomacsd-<version>-py3-none-any.whl`
+- `SHA256SUMS`
 
 The installed service is a user service tied to `graphical-session.target`. It starts the KDE helper
 as a companion service, and that helper exits unless `vomacsd-kde-helper check-kde-env` detects a
@@ -95,16 +74,15 @@ the first public release if you want normal open-source license metadata.
 
 ## Local environment
 
-For local development, a repo-local conda environment works well and keeps the Realtime
-dependency isolated from your base Python:
+For local development, prefer a repo-local `uv` environment:
 
 ```bash
-conda create -y -p .conda/vomacsd python=3.13 pip
-conda run -p .conda/vomacsd python -m pip install --no-build-isolation -e .
-conda run -p .conda/vomacsd python -m vomacsd --help
+uv sync
+uv run python -m vomacsd --help
 ```
 
-The `.conda/` directory is ignored by git.
+If you specifically need the old conda workflow for local system integration experiments,
+keep it separate from the default `uv` environment.
 
 ## Config
 
