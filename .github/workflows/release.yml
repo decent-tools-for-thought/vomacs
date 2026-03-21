@@ -103,7 +103,7 @@ jobs:
           runuser -u builder -- sh -lc "cd '$BUILD_ROOT' && cp PKGBUILD.release PKGBUILD && makepkg --printsrcinfo > .SRCINFO"
           mkdir -p /tmp/arch-release
           cp "$BUILD_ROOT"/vomacsd-*.pkg.tar.zst /tmp/arch-release/
-          cp "$BUILD_ROOT"/.SRCINFO /tmp/arch-release/.SRCINFO
+          cp "$BUILD_ROOT"/.SRCINFO /tmp/arch-release/SRCINFO
 
       - name: Upload Arch packaging artifacts
         uses: actions/upload-artifact@v4
@@ -111,7 +111,7 @@ jobs:
           name: arch-package
           path: |
             /tmp/arch-release/vomacsd-*.pkg.tar.zst
-            /tmp/arch-release/.SRCINFO
+            /tmp/arch-release/SRCINFO
 
   github-release:
     runs-on: ubuntu-latest
@@ -139,4 +139,4 @@ jobs:
             dist/release/vomacsd.install
             dist/release/python/*.whl
             dist/arch/vomacsd-*.pkg.tar.zst
-            dist/arch/.SRCINFO
+            dist/arch/SRCINFO

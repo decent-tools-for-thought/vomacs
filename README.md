@@ -58,7 +58,7 @@ The release flow now targets Arch installation in two ways:
 - release source assets for manual `makepkg` builds:
   - a release source tarball
   - a rendered `PKGBUILD`
-  - a rendered `.SRCINFO`
+  - a rendered `SRCINFO`
   - `vomacsd.install`
 
 For the normal install path on Arch, download the package asset from the GitHub release and install it:
