@@ -33,19 +33,19 @@ to output commands and hooks. The daemon does not pretend that `Ctrl+V` is unive
 Start the daemon:
 
 ```bash
-PYTHONPATH=src python3 -m vomacsd init-config
-PYTHONPATH=src python3 -m vomacsd serve
+PYTHONPATH=python-src python3 -m vomacsd init-config
+PYTHONPATH=python-src python3 -m vomacsd serve
 ```
 
 Control it from another shell:
 
 ```bash
-PYTHONPATH=src python3 -m vomacsd status
-PYTHONPATH=src python3 -m vomacsd start
-PYTHONPATH=src python3 -m vomacsd stop
-PYTHONPATH=src python3 -m vomacsd toggle
-PYTHONPATH=src python3 -m vomacsd cancel
-PYTHONPATH=src python3 -m vomacsd reload
+PYTHONPATH=python-src python3 -m vomacsd status
+PYTHONPATH=python-src python3 -m vomacsd start
+PYTHONPATH=python-src python3 -m vomacsd stop
+PYTHONPATH=python-src python3 -m vomacsd toggle
+PYTHONPATH=python-src python3 -m vomacsd cancel
+PYTHONPATH=python-src python3 -m vomacsd reload
 ```
 
 There is also a user-service template at [contrib/vomacsd.service](/home/morty/Software/vomacs/contrib/vomacsd.service).
@@ -76,6 +76,15 @@ makepkg -si
 systemctl --user daemon-reload
 systemctl --user enable --now vomacsd.service
 ```
+
+For local builds from this repo checkout, the root now includes a ready-to-run `PKGBUILD` and `SRCINFO`, so you can do:
+
+```bash
+cd /home/morty/Software/vomacs
+env PATH=/usr/bin:/bin makepkg -si
+```
+
+The `PATH` prefix matters on machines where conda is ahead of `/usr/bin`, because `makepkg` should use Arch's system Python toolchain rather than a conda Python.
 
 The installed service is a user service tied to `graphical-session.target`. It starts the KDE helper
 as a companion service, and that helper exits unless `vomacsd-kde-helper check-kde-env` detects a

@@ -14,7 +14,7 @@ vomacsd = "vomacsd.cli:main"
 vomacsd-kde-helper = "vomacsd.kde_helper:main"
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = {"" = "python-src"}
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["python-src"]
