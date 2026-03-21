@@ -1,0 +1,14 @@
+[Unit]
+Description=vomacsd voice transcription daemon
+After=graphical-session.target
+PartOf=graphical-session.target
+Wants=vomacsd-kde-helper.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/vomacsd serve
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target
