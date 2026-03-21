@@ -46,7 +46,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--config", type=Path, default=default_config_path())
     parser.add_argument("--socket", type=Path, default=default_socket_path())
 
-    sub = parser.add_subparsers(dest="command", required=True)
+    sub = parser.add_subparsers(dest="command")
     sub.add_parser("serve")
     sub.add_parser("start")
     sub.add_parser("stop")
@@ -71,7 +71,11 @@ def _send(socket_path: Path, payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = _parser().parse_args(argv)
+    cli_parser = _parser()
+    args = cli_parser.parse_args(argv)
+    if args.command is None:
+        cli_parser.print_help()
+        return 0
 
     if args.command == "serve":
         try:

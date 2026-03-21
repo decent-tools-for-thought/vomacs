@@ -19,7 +19,7 @@ def _parser() -> argparse.ArgumentParser:
         description="KDE session helper for vomacsd.",
     )
     parser.add_argument("--socket", type=Path, default=default_socket_path())
-    sub = parser.add_subparsers(dest="command", required=True)
+    sub = parser.add_subparsers(dest="command")
 
     serve = sub.add_parser("serve")
     serve.add_argument("--poll-interval", type=float, default=0.5)
@@ -122,7 +122,11 @@ def serve(socket_path: Path, *, poll_interval: float) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = _parser().parse_args(argv)
+    cli_parser = _parser()
+    args = cli_parser.parse_args(argv)
+    if args.command is None:
+        cli_parser.print_help()
+        return 0
 
     if args.command == "check-kde-env":
         return 0 if _is_kde_session() else 1
