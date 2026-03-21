@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
@@ -56,7 +56,7 @@ jobs:
           cp dist/*.whl dist/release/python/
 
       - name: Upload release preparation artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: release-assets
           path: dist/release
@@ -82,7 +82,7 @@ jobs:
             ffmpeg \
             libnotify
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: release-assets
           path: /tmp/release-assets
@@ -106,7 +106,7 @@ jobs:
           cp "$BUILD_ROOT"/.SRCINFO /tmp/arch-release/SRCINFO
 
       - name: Upload Arch packaging artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: arch-package
           path: |
@@ -120,18 +120,18 @@ jobs:
       - arch-package
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: release-assets
           path: dist/release
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: arch-package
           path: dist/arch
 
       - name: Publish GitHub release assets
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.4.2
         with:
           files: |
             dist/release/vomacsd-*.tar.gz
