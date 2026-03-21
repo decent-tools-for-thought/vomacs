@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  build-and-verify:
     runs-on: ubuntu-latest
 
     steps:
@@ -43,6 +43,58 @@ jobs:
             cd dist
             sha256sum "vomacsd-${VERSION}.tar.gz" > SHA256SUMS
           )
+
+      - name: Verify wheel artifact library import
+        run: |
+          python -m venv .venv-wheel-import
+          . .venv-wheel-import/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install "$(ls dist/*.whl)"
+          python -c "import vomacsd"
+
+      - name: Verify wheel artifact console script
+        run: |
+          python -m venv .venv-wheel-cli
+          . .venv-wheel-cli/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install "$(ls dist/*.whl)"
+          vomacsd --help
+
+      - name: Verify sdist artifact library import
+        run: |
+          SDIST="$(python -c 'from pathlib import Path; import os; version = os.environ["GITHUB_REF_NAME"][1:]; candidates = [p for p in Path("dist").glob("vomacsd-*.tar.gz") if p.name != f"vomacsd-{version}.tar.gz"]; assert len(candidates) == 1, candidates; print(candidates[0])')"
+          python -m venv .venv-sdist-import
+          . .venv-sdist-import/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install "${SDIST}"
+          python -c "import vomacsd"
+
+      - name: Verify sdist artifact console script
+        run: |
+          SDIST="$(python -c 'from pathlib import Path; import os; version = os.environ["GITHUB_REF_NAME"][1:]; candidates = [p for p in Path("dist").glob("vomacsd-*.tar.gz") if p.name != f"vomacsd-{version}.tar.gz"]; assert len(candidates) == 1, candidates; print(candidates[0])')"
+          python -m venv .venv-sdist-cli
+          . .venv-sdist-cli/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install "${SDIST}"
+          vomacsd --help
+
+      - name: Upload verified release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: dist/
+          if-no-files-found: error
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build-and-verify
+
+    steps:
+      - name: Download verified release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+          path: dist
 
       - name: Publish GitHub release assets
         uses: softprops/action-gh-release@v2.4.2
