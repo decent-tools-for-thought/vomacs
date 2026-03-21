@@ -82,7 +82,7 @@ jobs:
             ffmpeg \
             libnotify
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: release-assets
           path: /tmp/release-assets
@@ -120,12 +120,12 @@ jobs:
       - arch-package
 
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: release-assets
           path: dist/release
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: arch-package
           path: dist/arch
