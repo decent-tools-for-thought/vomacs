@@ -5,7 +5,6 @@ import os
 from pathlib import Path
 from typing import Any
 
-
 DEFAULT_CONFIG: dict[str, Any] = {
     "openai": {
         "api_key": None,
@@ -80,7 +79,10 @@ def config_dir() -> Path:
 
 
 def state_dir() -> Path:
-    return Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state")) / "vomacsd"
+    return (
+        Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
+        / "vomacsd"
+    )
 
 
 def runtime_dir() -> Path:
@@ -97,7 +99,7 @@ def default_socket_path() -> Path:
 
 
 def ensure_directories(config_path: Path | None = None) -> None:
-    target_config_dir = (config_path.parent if config_path else config_dir())
+    target_config_dir = config_path.parent if config_path else config_dir()
     target_config_dir.mkdir(parents=True, exist_ok=True)
     state_dir().mkdir(parents=True, exist_ok=True)
     runtime_dir().mkdir(parents=True, exist_ok=True)

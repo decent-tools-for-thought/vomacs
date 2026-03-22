@@ -10,7 +10,7 @@ import traceback
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from vomacsd import kde
 from vomacsd.audio import maybe_prepare_upload_audio, start_recording, stop_recording
@@ -75,7 +75,10 @@ class Controller:
     def start(self) -> dict[str, Any]:
         with self.lock:
             if self.phase != "idle":
-                return {"ok": False, "error": f"Cannot start while phase is {self.phase}"}
+                return {
+                    "ok": False,
+                    "error": f"Cannot start while phase is {self.phase}",
+                }
 
             session_id = uuid.uuid4().hex
             backend = transcription_backend(self.config)
@@ -86,7 +89,9 @@ class Controller:
                 realtime_transcriber = None
                 process = None
                 if backend == "realtime":
-                    realtime_transcriber = start_realtime_transcription(self.config, audio_path)
+                    realtime_transcriber = start_realtime_transcription(
+                        self.config, audio_path
+                    )
                 else:
                     process = start_recording(self.config, audio_path)
 
@@ -193,8 +198,13 @@ class Controller:
                 payload["audio_path"] = str(self.session.audio_path)
                 payload["started_at"] = self.session.started_at
                 payload["target_window"] = self.session.target_window
-                if self.session.backend == "realtime" and self.session.realtime_transcriber:
-                    payload["realtime"] = self.session.realtime_transcriber.status_snapshot()
+                if (
+                    self.session.backend == "realtime"
+                    and self.session.realtime_transcriber
+                ):
+                    payload["realtime"] = (
+                        self.session.realtime_transcriber.status_snapshot()
+                    )
             if self.last_result:
                 payload["last_result"] = self.last_result
             return payload
@@ -207,7 +217,9 @@ class Controller:
             return base_dir / f"{session_id}.wav"
 
         state_dir().mkdir(parents=True, exist_ok=True)
-        fd, raw_path = tempfile.mkstemp(prefix=f"{session_id}-", suffix=".wav", dir=state_dir())
+        fd, raw_path = tempfile.mkstemp(
+            prefix=f"{session_id}-", suffix=".wav", dir=state_dir()
+        )
         os.close(fd)
         return Path(raw_path)
 
@@ -253,9 +265,13 @@ class Controller:
         target_window = resolve_target(self.config, session.target_window)
         upload_audio_path = session.audio_path
         try:
-            env = self._session_env(session, phase="preparing", target_window=target_window)
+            env = self._session_env(
+                session, phase="preparing", target_window=target_window
+            )
             run_commands(self.config["pipelines"].get("before_transcription", []), env)
-            upload_audio_path = maybe_prepare_upload_audio(self.config, session.audio_path)
+            upload_audio_path = maybe_prepare_upload_audio(
+                self.config, session.audio_path
+            )
 
             env = self._session_env(
                 session,
@@ -285,10 +301,18 @@ class Controller:
                 target_window=target_window,
                 upload_audio_path=upload_audio_path,
             )
-            run_commands(hook_list(self.config, "transcription_finished"), env, stdin_text=transcript)
-            run_commands(hook_list(self.config, "output_started"), env, stdin_text=transcript)
+            run_commands(
+                hook_list(self.config, "transcription_finished"),
+                env,
+                stdin_text=transcript,
+            )
+            run_commands(
+                hook_list(self.config, "output_started"), env, stdin_text=transcript
+            )
             deliver_text(self.config, transcript, target=target_window, env=env)
-            run_commands(hook_list(self.config, "output_finished"), env, stdin_text=transcript)
+            run_commands(
+                hook_list(self.config, "output_finished"), env, stdin_text=transcript
+            )
 
             result = {
                 "status": "ok",
@@ -359,10 +383,18 @@ class Controller:
                 transcript=transcript,
                 target_window=target_window,
             )
-            run_commands(hook_list(self.config, "transcription_finished"), env, stdin_text=transcript)
-            run_commands(hook_list(self.config, "output_started"), env, stdin_text=transcript)
+            run_commands(
+                hook_list(self.config, "transcription_finished"),
+                env,
+                stdin_text=transcript,
+            )
+            run_commands(
+                hook_list(self.config, "output_started"), env, stdin_text=transcript
+            )
             deliver_text(self.config, transcript, target=target_window, env=env)
-            run_commands(hook_list(self.config, "output_finished"), env, stdin_text=transcript)
+            run_commands(
+                hook_list(self.config, "output_finished"), env, stdin_text=transcript
+            )
 
             result = {
                 "status": "ok",
@@ -420,7 +452,8 @@ class ControlHandler(socketserver.StreamRequestHandler):
         if not line:
             return
         request = json.loads(line.decode("utf-8"))
-        response = self.server.controller.handle_request(request)
+        server = cast("ControlServer", self.server)
+        response = server.controller.handle_request(request)
         self.wfile.write((json.dumps(response) + "\n").encode("utf-8"))
 
 
@@ -436,7 +469,9 @@ class ControlServer(socketserver.ThreadingUnixStreamServer):
         super().__init__(str(socket_path), ControlHandler)
 
 
-def serve_forever(config_path: Path | None = None, socket_path: Path | None = None) -> None:
+def serve_forever(
+    config_path: Path | None = None, socket_path: Path | None = None
+) -> None:
     controller = Controller(config_path)
     server = ControlServer(socket_path or default_socket_path(), controller)
     try:

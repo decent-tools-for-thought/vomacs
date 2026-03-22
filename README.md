@@ -37,6 +37,13 @@ uv sync
 uv run vomacsd --help
 ```
 
+Install from source with `pip` if you want a plain packaging smoke check:
+
+```bash
+python -m pip install .
+vomacsd --help
+```
+
 Start the daemon:
 
 ```bash
@@ -55,7 +62,39 @@ uv run python -m vomacsd cancel
 uv run python -m vomacsd reload
 ```
 
-There is also a user-service template at [contrib/vomacsd.service](/home/morty/Software/vomacs/contrib/vomacsd.service).
+There is also a user-service template at [contrib/vomacsd.service](/home/morty/Software/dtft/vomacs/contrib/vomacsd.service).
+
+## Auth and config
+
+Initialize the default config file:
+
+```bash
+uv run python -m vomacsd init-config
+```
+
+By default this writes to `~/.config/vomacsd/config.json`.
+
+Authentication can be configured either by placing an API key directly in the config
+or by exporting the environment variable named by `openai.api_key_env`, which defaults
+to `OPENAI_API_KEY`:
+
+```bash
+export OPENAI_API_KEY=...
+uv run python -m vomacsd print-default-config
+```
+
+The daemon socket defaults to `${XDG_RUNTIME_DIR}/vomacsd/control.sock` and falls back to
+`/tmp/vomacsd-<uid>/vomacsd/control.sock` when `XDG_RUNTIME_DIR` is unset.
+
+## Smoke test
+
+For a minimal local smoke check that does not hit audio capture or OpenAI:
+
+```bash
+uv run vomacsd --help
+PYTHONPATH=python-src python -m unittest discover -s tests -v
+python -c "from vomacsd.config import default_socket_path; assert default_socket_path().name == 'control.sock'"
+```
 
 ## Release assets
 
@@ -79,6 +118,10 @@ For local development, prefer a repo-local `uv` environment:
 ```bash
 uv sync
 uv run python -m vomacsd --help
+uv run ruff format --check .
+uv run ruff check .
+uv run mypy
+PYTHONPATH=python-src python -m unittest discover -s tests -v
 ```
 
 If you specifically need the old conda workflow for local system integration experiments,

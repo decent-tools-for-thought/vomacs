@@ -45,7 +45,11 @@ def _is_kde_session(env: dict[str, str] | None = None) -> bool:
         current.get("KDE_FULL_SESSION", ""),
     ]
     joined = ":".join(values).upper()
-    return "KDE" in joined or "PLASMA" in joined or current.get("KDE_FULL_SESSION") == "true"
+    return (
+        "KDE" in joined
+        or "PLASMA" in joined
+        or current.get("KDE_FULL_SESSION") == "true"
+    )
 
 
 def _notify(summary: str, body: str | None = None, *, urgency: str = "normal") -> None:
@@ -53,7 +57,9 @@ def _notify(summary: str, body: str | None = None, *, urgency: str = "normal") -
     if body:
         command.append(body)
     try:
-        subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(
+            command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
     except Exception:
         pass
 
@@ -72,7 +78,13 @@ def _result_signature(result: dict[str, Any] | None) -> tuple[Any, ...] | None:
 def _status(socket_path: Path) -> dict[str, Any] | None:
     try:
         return _send(socket_path, {"action": "status"})
-    except (FileNotFoundError, ConnectionRefusedError, PermissionError, OSError, json.JSONDecodeError):
+    except (
+        FileNotFoundError,
+        ConnectionRefusedError,
+        PermissionError,
+        OSError,
+        json.JSONDecodeError,
+    ):
         return None
 
 
@@ -94,7 +106,11 @@ def _handle_result_change(result: dict[str, Any] | None) -> None:
     elif status == "cancelled":
         _notify("vomacsd", "Recording cancelled")
     elif status == "error":
-        _notify("vomacsd", str(result.get("error", "Transcription failed")), urgency="critical")
+        _notify(
+            "vomacsd",
+            str(result.get("error", "Transcription failed")),
+            urgency="critical",
+        )
 
 
 def serve(socket_path: Path, *, poll_interval: float) -> int:

@@ -10,6 +10,12 @@ license = "0BSD"
 requires-python = ">=3.11"
 dependencies = ["websocket-client>=1.8.0"]
 
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "ruff>=0.15.7",
+]
+
 [project.scripts]
 vomacsd = "vomacsd.cli:main"
 vomacsd-kde-helper = "vomacsd.kde_helper:main"
@@ -19,3 +25,25 @@ package-dir = {"" = "python-src"}
 
 [tool.setuptools.packages.find]
 where = ["python-src"]
+
+[tool.ruff]
+target-version = "py311"
+src = ["python-src", "tests"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["python-src/vomacsd", "tests"]
+mypy_path = ["python-src"]
+check_untyped_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+
+[[tool.mypy.overrides]]
+module = ["websocket"]
+ignore_missing_imports = true

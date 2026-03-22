@@ -7,7 +7,9 @@ from typing import Any
 from vomacsd import kde
 
 
-def resolve_target(config: dict[str, Any], start_target: dict[str, Any] | None) -> dict[str, Any] | None:
+def resolve_target(
+    config: dict[str, Any], start_target: dict[str, Any] | None
+) -> dict[str, Any] | None:
     target_config = config["target"]
     provider = target_config.get("provider")
     if provider != "kde_kwin":

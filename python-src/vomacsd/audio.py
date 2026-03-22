@@ -47,7 +47,9 @@ def start_recording(config: dict[str, Any], output_path: Path) -> subprocess.Pop
     return process
 
 
-def stop_recording(process: subprocess.Popen[str], *, timeout_seconds: float = 10.0) -> None:
+def stop_recording(
+    process: subprocess.Popen[str], *, timeout_seconds: float = 10.0
+) -> None:
     if process.poll() is not None:
         return
 

@@ -5,7 +5,9 @@ import subprocess
 from typing import Any
 
 
-def run_commands(commands: list[str], env: dict[str, str], *, stdin_text: str | None = None) -> None:
+def run_commands(
+    commands: list[str], env: dict[str, str], *, stdin_text: str | None = None
+) -> None:
     merged_env = os.environ.copy()
     merged_env.update(env)
     for command in commands:

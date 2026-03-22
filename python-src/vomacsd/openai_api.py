@@ -26,26 +26,24 @@ def _multipart_body(
     body = bytearray()
 
     for name, value in fields.items():
-        body.extend(f"--{boundary}\r\n".encode("utf-8"))
-        body.extend(
-            f'Content-Disposition: form-data; name="{name}"\r\n\r\n'.encode("utf-8")
-        )
+        body.extend(f"--{boundary}\r\n".encode())
+        body.extend(f'Content-Disposition: form-data; name="{name}"\r\n\r\n'.encode())
         body.extend(value.encode("utf-8"))
         body.extend(b"\r\n")
 
     for field_name, filename, content, content_type in files:
-        body.extend(f"--{boundary}\r\n".encode("utf-8"))
+        body.extend(f"--{boundary}\r\n".encode())
         body.extend(
             (
                 f'Content-Disposition: form-data; name="{field_name}"; '
                 f'filename="{filename}"\r\n'
-            ).encode("utf-8")
+            ).encode()
         )
-        body.extend(f"Content-Type: {content_type}\r\n\r\n".encode("utf-8"))
+        body.extend(f"Content-Type: {content_type}\r\n\r\n".encode())
         body.extend(content)
         body.extend(b"\r\n")
 
-    body.extend(f"--{boundary}--\r\n".encode("utf-8"))
+    body.extend(f"--{boundary}--\r\n".encode())
     return f"multipart/form-data; boundary={boundary}", bytes(body)
 
 
@@ -61,7 +59,8 @@ def _api_key(config: dict[str, Any]) -> str:
             return value
 
     raise RuntimeError(
-        "No OpenAI API key configured. Set openai.api_key or export the configured api_key_env."
+        "No OpenAI API key configured. Set openai.api_key or export "
+        "the configured api_key_env."
     )
 
 
@@ -103,11 +102,15 @@ def transcribe_file(config: dict[str, Any], audio_path: Path) -> str:
             payload = json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         error_body = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"OpenAI request failed with {exc.code}: {error_body}") from exc
+        raise RuntimeError(
+            f"OpenAI request failed with {exc.code}: {error_body}"
+        ) from exc
 
     text = payload.get("text")
     if not isinstance(text, str) or not text.strip():
-        raise RuntimeError(f"OpenAI response did not contain transcription text: {payload!r}")
+        raise RuntimeError(
+            f"OpenAI response did not contain transcription text: {payload!r}"
+        )
     return text.strip()
 
 
@@ -135,8 +138,12 @@ class RealtimeTranscriber:
             channels=self.channels,
             chunk_ms=self.chunk_ms,
         )
-        self.connect_timeout_seconds = float(self.realtime.get("connect_timeout_seconds", 20))
-        self.finalize_timeout_seconds = float(self.realtime.get("finalize_timeout_seconds", 15))
+        self.connect_timeout_seconds = float(
+            self.realtime.get("connect_timeout_seconds", 20)
+        )
+        self.finalize_timeout_seconds = float(
+            self.realtime.get("finalize_timeout_seconds", 15)
+        )
         self.settle_seconds = max(0.4, self.chunk_ms / 1000.0 * 2)
         self._state_lock = threading.RLock()
         self._send_lock = threading.RLock()
@@ -160,7 +167,9 @@ class RealtimeTranscriber:
     def start(self) -> None:
         websocket_module = _load_websocket_client()
         session_payload = _realtime_transcription_session_payload(self.config)
-        session_data = _create_realtime_client_secret_session(self.config, session_payload)
+        session_data = _create_realtime_client_secret_session(
+            self.config, session_payload
+        )
         self._session_id = _realtime_session_id(session_data)
         secret = _realtime_client_secret_value(session_data)
         self._ws = websocket_module.create_connection(
@@ -205,7 +214,9 @@ class RealtimeTranscriber:
         if thread is not None:
             thread.join(timeout=self.finalize_timeout_seconds)
             if thread.is_alive():
-                raise RuntimeError("Timed out while waiting for the realtime audio stream to stop")
+                raise RuntimeError(
+                    "Timed out while waiting for the realtime audio stream to stop"
+                )
         self._raise_if_error()
 
     def finalize(self) -> str:
@@ -223,9 +234,13 @@ class RealtimeTranscriber:
             with self._state_lock:
                 pending = self._pending_segments_locked()
                 quiet_for = time.monotonic() - self._last_event_at
-            waited_long_enough = time.monotonic() - finalize_started >= self.settle_seconds
-            if pending == 0 and quiet_for >= self.settle_seconds / 2 and (
-                not should_commit or waited_long_enough
+            waited_long_enough = (
+                time.monotonic() - finalize_started >= self.settle_seconds
+            )
+            if (
+                pending == 0
+                and quiet_for >= self.settle_seconds / 2
+                and (not should_commit or waited_long_enough)
             ):
                 break
             time.sleep(0.05)
@@ -235,14 +250,17 @@ class RealtimeTranscriber:
         if pending:
             self.close()
             raise RuntimeError(
-                f"Timed out waiting for {pending} realtime transcription segment(s) to complete"
+                "Timed out waiting for "
+                f"{pending} realtime transcription segment(s) to complete"
             )
 
         transcript = self.current_transcript()
         self.close()
 
         if not transcript.strip():
-            raise RuntimeError("OpenAI Realtime session did not produce transcription text")
+            raise RuntimeError(
+                "OpenAI Realtime session did not produce transcription text"
+            )
         return transcript.strip()
 
     def cancel(self) -> None:
@@ -270,7 +288,9 @@ class RealtimeTranscriber:
     def status_snapshot(self) -> dict[str, Any]:
         with self._state_lock:
             completed_segments = sum(
-                1 for segment in self._segments.values() if segment.completed_text is not None
+                1
+                for segment in self._segments.values()
+                if segment.completed_text is not None
             )
             return {
                 "session_id": self._session_id,
@@ -327,7 +347,9 @@ class RealtimeTranscriber:
                         break
                     if self._closed:
                         break
-                    self._set_error(RuntimeError(f"Realtime websocket receive failed: {exc}"))
+                    self._set_error(
+                        RuntimeError(f"Realtime websocket receive failed: {exc}")
+                    )
                     break
 
                 if raw_message is None:
@@ -354,7 +376,9 @@ class RealtimeTranscriber:
                 item_id = event.get("item_id")
                 if isinstance(item_id, str):
                     segment = self._segment_locked(item_id)
-                    segment.previous_item_id = _as_optional_str(event.get("previous_item_id"))
+                    segment.previous_item_id = _as_optional_str(
+                        event.get("previous_item_id")
+                    )
                     segment.commit_index = self._commit_counter
                     self._commit_counter += 1
                     self._audio_bytes_since_commit = 0
@@ -385,7 +409,9 @@ class RealtimeTranscriber:
     def _segment_locked(self, item_id: str) -> TranscriptSegment:
         segment = self._segments.get(item_id)
         if segment is None:
-            segment = TranscriptSegment(item_id=item_id, created_index=self._segment_counter)
+            segment = TranscriptSegment(
+                item_id=item_id, created_index=self._segment_counter
+            )
             self._segments[item_id] = segment
             self._segment_counter += 1
         return segment
@@ -421,7 +447,9 @@ class RealtimeTranscriber:
         by_id = {segment.item_id: segment for segment in segments}
         children_by_previous: dict[str | None, list[TranscriptSegment]] = {}
         for segment in segments:
-            children_by_previous.setdefault(segment.previous_item_id, []).append(segment)
+            children_by_previous.setdefault(segment.previous_item_id, []).append(
+                segment
+            )
 
         ordered: list[TranscriptSegment] = []
         seen: set[str] = set()
@@ -468,7 +496,9 @@ class RealtimeTranscriber:
             raise error
 
 
-def start_realtime_transcription(config: dict[str, Any], audio_path: Path) -> RealtimeTranscriber:
+def start_realtime_transcription(
+    config: dict[str, Any], audio_path: Path
+) -> RealtimeTranscriber:
     transcriber = RealtimeTranscriber(config, audio_path)
     try:
         transcriber.start()
@@ -547,7 +577,9 @@ def _create_realtime_client_secret_session(
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         error_body = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"OpenAI request failed with {exc.code}: {error_body}") from exc
+        raise RuntimeError(
+            f"OpenAI request failed with {exc.code}: {error_body}"
+        ) from exc
 
 
 def _realtime_client_secret_value(payload: dict[str, Any]) -> str:
@@ -559,7 +591,9 @@ def _realtime_client_secret_value(payload: dict[str, Any]) -> str:
         value = client_secret.get("value")
         if isinstance(value, str) and value:
             return value
-    raise RuntimeError(f"Realtime client secret response did not contain a usable secret: {payload!r}")
+    raise RuntimeError(
+        f"Realtime client secret response did not contain a usable secret: {payload!r}"
+    )
 
 
 def _realtime_session_id(payload: dict[str, Any]) -> str | None:
@@ -588,7 +622,9 @@ def _as_optional_str(value: Any) -> str | None:
 def _segment_sort_key(segment: TranscriptSegment) -> tuple[bool, int, int]:
     return (
         segment.commit_index is None,
-        segment.commit_index if segment.commit_index is not None else segment.created_index,
+        segment.commit_index
+        if segment.commit_index is not None
+        else segment.created_index,
         segment.created_index,
     )
 
@@ -598,4 +634,7 @@ def _looks_like_ws_timeout(exc: Exception) -> bool:
 
 
 def _looks_like_ws_closed(exc: Exception) -> bool:
-    return exc.__class__.__name__ in {"WebSocketConnectionClosedException", "BrokenPipeError"}
+    return exc.__class__.__name__ in {
+        "WebSocketConnectionClosedException",
+        "BrokenPipeError",
+    }

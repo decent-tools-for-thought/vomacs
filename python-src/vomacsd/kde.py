@@ -53,7 +53,9 @@ def _parse_a_sv(output: str) -> dict[str, Any]:
 
 
 def query_active_window() -> dict[str, Any] | None:
-    output = _run_busctl(["call", "org.kde.KWin", "/KWin", "org.kde.KWin", "queryWindowInfo"])
+    output = _run_busctl(
+        ["call", "org.kde.KWin", "/KWin", "org.kde.KWin", "queryWindowInfo"]
+    )
     if not output:
         return None
     return _parse_a_sv(output)

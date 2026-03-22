@@ -51,6 +51,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install "$(ls dist/*.whl)"
           python -c "import vomacsd"
+          python -c "from vomacsd.config import default_socket_path; assert default_socket_path().name == 'control.sock'"
 
       - name: Verify wheel artifact console script
         run: |
@@ -68,6 +69,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install "${SDIST}"
           python -c "import vomacsd"
+          python -c "from vomacsd.config import default_socket_path; assert default_socket_path().name == 'control.sock'"
 
       - name: Verify sdist artifact console script
         run: |
