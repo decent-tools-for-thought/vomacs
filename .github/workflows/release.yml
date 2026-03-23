@@ -55,10 +55,10 @@ jobs:
             --format=tar.gz \
             --prefix="vomacsd-${VERSION}/" \
             HEAD \
-            -o "dist/vomacsd-${VERSION}.tar.gz"
+            -o "dist/vomacsd-${VERSION}-release-source.tar.gz"
           (
             cd dist
-            sha256sum "vomacsd-${VERSION}.tar.gz" > SHA256SUMS
+            sha256sum "vomacsd-${VERSION}-release-source.tar.gz" > SHA256SUMS
           )
 
       - name: Verify wheel artifact library import
@@ -80,7 +80,7 @@ jobs:
 
       - name: Verify sdist artifact library import
         run: |
-          SDIST="$(python -c 'from pathlib import Path; version = "${{ steps.release_meta.outputs.tag }}".removeprefix("v"); candidates = [p for p in Path("dist").glob("vomacsd-*.tar.gz") if p.name != f"vomacsd-{version}.tar.gz"]; assert len(candidates) == 1, candidates; print(candidates[0])')"
+          SDIST="$(python -c 'from pathlib import Path; candidates = [p for p in Path("dist").glob("vomacsd-*.tar.gz") if "-release-source" not in p.name]; assert len(candidates) == 1, candidates; print(candidates[0])')"
           python -m venv .venv-sdist-import
           . .venv-sdist-import/bin/activate
           python -m pip install --upgrade pip
@@ -90,7 +90,7 @@ jobs:
 
       - name: Verify sdist artifact console script
         run: |
-          SDIST="$(python -c 'from pathlib import Path; version = "${{ steps.release_meta.outputs.tag }}".removeprefix("v"); candidates = [p for p in Path("dist").glob("vomacsd-*.tar.gz") if p.name != f"vomacsd-{version}.tar.gz"]; assert len(candidates) == 1, candidates; print(candidates[0])')"
+          SDIST="$(python -c 'from pathlib import Path; candidates = [p for p in Path("dist").glob("vomacsd-*.tar.gz") if "-release-source" not in p.name]; assert len(candidates) == 1, candidates; print(candidates[0])')"
           python -m venv .venv-sdist-cli
           . .venv-sdist-cli/bin/activate
           python -m pip install --upgrade pip
