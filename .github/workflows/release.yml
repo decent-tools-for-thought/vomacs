@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Release tag to publish. Defaults to v<project version>.
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -11,6 +17,8 @@ permissions:
 jobs:
   build-and-verify:
     runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.release_meta.outputs.tag }}
 
     steps:
       - uses: actions/checkout@v6
@@ -21,10 +29,18 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Validate tag matches project version
+      - name: Resolve release tag
+        id: release_meta
         run: |
           version="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
-          test "${GITHUB_REF_NAME}" = "v${version}"
+          tag="${{ github.event.inputs.release_tag }}"
+          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+            tag="${GITHUB_REF_NAME}"
+          elif [ -z "$tag" ]; then
+            tag="v${version}"
+          fi
+          test "$tag" = "v${version}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - name: Build Python distributions
         run: |
@@ -33,11 +49,12 @@ jobs:
 
       - name: Build tagged source archive
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${{ steps.release_meta.outputs.tag }}"
+          VERSION="${VERSION#v}"
           git archive \
             --format=tar.gz \
             --prefix="vomacsd-${VERSION}/" \
-            "${GITHUB_REF_NAME}" \
+            HEAD \
             -o "dist/vomacsd-${VERSION}.tar.gz"
           (
             cd dist
@@ -63,7 +80,7 @@ jobs:
 
       - name: Verify sdist artifact library import
         run: |
-          SDIST="$(python -c 'from pathlib import Path; import os; version = os.environ["GITHUB_REF_NAME"][1:]; candidates = [p for p in Path("dist").glob("vomacsd-*.tar.gz") if p.name != f"vomacsd-{version}.tar.gz"]; assert len(candidates) == 1, candidates; print(candidates[0])')"
+          SDIST="$(python -c 'from pathlib import Path; version = "${{ steps.release_meta.outputs.tag }}".removeprefix("v"); candidates = [p for p in Path("dist").glob("vomacsd-*.tar.gz") if p.name != f"vomacsd-{version}.tar.gz"]; assert len(candidates) == 1, candidates; print(candidates[0])')"
           python -m venv .venv-sdist-import
           . .venv-sdist-import/bin/activate
           python -m pip install --upgrade pip
@@ -73,7 +90,7 @@ jobs:
 
       - name: Verify sdist artifact console script
         run: |
-          SDIST="$(python -c 'from pathlib import Path; import os; version = os.environ["GITHUB_REF_NAME"][1:]; candidates = [p for p in Path("dist").glob("vomacsd-*.tar.gz") if p.name != f"vomacsd-{version}.tar.gz"]; assert len(candidates) == 1, candidates; print(candidates[0])')"
+          SDIST="$(python -c 'from pathlib import Path; version = "${{ steps.release_meta.outputs.tag }}".removeprefix("v"); candidates = [p for p in Path("dist").glob("vomacsd-*.tar.gz") if p.name != f"vomacsd-{version}.tar.gz"]; assert len(candidates) == 1, candidates; print(candidates[0])')"
           python -m venv .venv-sdist-cli
           . .venv-sdist-cli/bin/activate
           python -m pip install --upgrade pip
@@ -101,6 +118,8 @@ jobs:
       - name: Publish GitHub release assets
         uses: softprops/action-gh-release@v2.4.2
         with:
+          tag_name: ${{ needs.build-and-verify.outputs.release_tag }}
+          target_commitish: ${{ github.sha }}
           files: |
             dist/*.tar.gz
             dist/*.whl
