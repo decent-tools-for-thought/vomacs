@@ -14,7 +14,6 @@ Hookable KDE Wayland voice-transcription daemon with foreground service mode, co
 > This codebase is entirely AI-generated. It is useful to me, I hope it might be useful to others, and issues and contributions are welcome.
 
 ## Map
-$$\color{#E5E7EB}Tool \space \color{#A1A1AA}Map$$
 - [Install](#install)
 - [Functionality](#functionality)
 - [Configuration](#configuration)
@@ -22,12 +21,13 @@ $$\color{#E5E7EB}Tool \space \color{#A1A1AA}Map$$
 - [Credits](#credits)
 
 ## Install
+$$\color{#E5E7EB}Install \space \color{#A1A1AA}Tool$$
 
 From a checkout:
 
 ```bash
-uv sync
-uv run python -m vomacsd --help
+uv sync                             # install project dependencies
+uv run python -m vomacsd --help     # inspect the daemon CLI
 ```
 
 The packaged entry points are:
@@ -36,9 +36,7 @@ The packaged entry points are:
 - `vomacsd-kde-helper`
 
 ## Functionality
-$$\color{#E5E7EB}Core \space \color{#A1A1AA}Features$$
-
-### Service Lifecycle
+$$\color{#E5E7EB}Service \space \color{#A1A1AA}Lifecycle$$
 - `vomacsd serve`: run the transcription daemon in the foreground.
 - `vomacsd start`: tell the running daemon to begin recording or transcription.
 - `vomacsd stop`: tell the running daemon to stop the current recording or transcription cycle.
@@ -47,12 +45,12 @@ $$\color{#E5E7EB}Core \space \color{#A1A1AA}Features$$
 - `vomacsd status`: fetch daemon status over the control socket.
 - `vomacsd reload`: reload daemon configuration.
 
-### Config Initialization And Inspection
+$$\color{#E5E7EB}Config \space \color{#A1A1AA}Setup$$
 - `vomacsd init-config`: write a default config file.
 - `vomacsd init-config --force`: overwrite an existing config file.
 - `vomacsd print-default-config`: print the built-in default config JSON.
 
-### Runtime Model
+$$\color{#E5E7EB}Runtime \space \color{#A1A1AA}Model$$
 - The daemon exposes a Unix socket control interface.
 - The daemon supports upload-after-recording transcription through `openai.backend = "file"`.
 - The daemon supports streamed transcription through `openai.backend = "realtime"`.
@@ -68,21 +66,20 @@ $$\color{#E5E7EB}User \space \color{#A1A1AA}Config$$
 There is also a user-service template at `contrib/vomacsd.service`.
 
 ## Quick Start
-$$\color{#E5E7EB}Quick \space \color{#A1A1AA}Start$$
+$$\color{#E5E7EB}Try \space \color{#A1A1AA}Daemon$$
 
 ```bash
-uv run python -m vomacsd init-config
+uv run python -m vomacsd init-config    # write the default config file
 
-uv run python -m vomacsd serve
+uv run python -m vomacsd serve          # run the daemon in the foreground
 
-uv run python -m vomacsd status
-uv run python -m vomacsd start
-uv run python -m vomacsd stop
-uv run python -m vomacsd toggle
+uv run python -m vomacsd status         # inspect daemon status
+uv run python -m vomacsd start          # begin recording or transcription
+uv run python -m vomacsd stop           # stop the active capture
+uv run python -m vomacsd toggle         # toggle the active state
 ```
 
 ## Credits
-$$\color{#E5E7EB}Project \space \color{#A1A1AA}Credits$$
 
 This project is built for KDE/Plasma desktop workflows and OpenAI transcription APIs and is not affiliated with KDE, Plasma, or OpenAI.
 
