@@ -14,11 +14,11 @@ Hookable KDE Wayland voice-transcription daemon with foreground service mode, co
 > This codebase is entirely AI-generated. It is useful to me, I hope it might be useful to others, and issues and contributions are welcome.
 
 ## Map
+$$\color{#E5E7EB}Tool \space \color{#A1A1AA}Map$$
 - [Install](#install)
 - [Functionality](#functionality)
 - [Configuration](#configuration)
 - [Quick Start](#quick-start)
-- [Development](#development)
 - [Credits](#credits)
 
 ## Install
@@ -36,6 +36,7 @@ The packaged entry points are:
 - `vomacsd-kde-helper`
 
 ## Functionality
+$$\color{#E5E7EB}Core \space \color{#A1A1AA}Features$$
 
 ### Service Lifecycle
 - `vomacsd serve`: run the transcription daemon in the foreground.
@@ -58,6 +59,7 @@ The packaged entry points are:
 - The daemon is designed for KDE Wayland workflows with clipboard and command hooks.
 
 ## Configuration
+$$\color{#E5E7EB}User \space \color{#A1A1AA}Config$$
 
 - Default config path: `~/.config/vomacsd/config.json`
 - Default API key env var: `OPENAI_API_KEY`
@@ -66,6 +68,7 @@ The packaged entry points are:
 There is also a user-service template at `contrib/vomacsd.service`.
 
 ## Quick Start
+$$\color{#E5E7EB}Quick \space \color{#A1A1AA}Start$$
 
 ```bash
 uv run python -m vomacsd init-config
@@ -78,16 +81,8 @@ uv run python -m vomacsd stop
 uv run python -m vomacsd toggle
 ```
 
-## Development
-
-```bash
-uv run ruff format --check .
-uv run ruff check .
-uv run mypy
-PYTHONPATH=python-src python -m unittest discover -s tests -v
-```
-
 ## Credits
+$$\color{#E5E7EB}Project \space \color{#A1A1AA}Credits$$
 
 This project is built for KDE/Plasma desktop workflows and OpenAI transcription APIs and is not affiliated with KDE, Plasma, or OpenAI.
 
