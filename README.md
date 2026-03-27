@@ -21,7 +21,7 @@ Hookable KDE Wayland voice-transcription daemon with foreground service mode, co
 - [Credits](#credits)
 
 ## Install
-$$\color{#E5E7EB}Install \space \color{#A1A1AA}Tool$$
+$$\color{#D4D4D8}Install \space \color{#A1A1AA}Tool$$
 
 From a checkout:
 
@@ -36,7 +36,7 @@ The packaged entry points are:
 - `vomacsd-kde-helper`
 
 ## Functionality
-$$\color{#E5E7EB}Service \space \color{#A1A1AA}Lifecycle$$
+$$\color{#D4D4D8}Service \space \color{#A1A1AA}Lifecycle$$
 - `vomacsd serve`: run the transcription daemon in the foreground.
 - `vomacsd start`: tell the running daemon to begin recording or transcription.
 - `vomacsd stop`: tell the running daemon to stop the current recording or transcription cycle.
@@ -45,19 +45,19 @@ $$\color{#E5E7EB}Service \space \color{#A1A1AA}Lifecycle$$
 - `vomacsd status`: fetch daemon status over the control socket.
 - `vomacsd reload`: reload daemon configuration.
 
-$$\color{#E5E7EB}Config \space \color{#A1A1AA}Setup$$
+$$\color{#D4D4D8}Config \space \color{#A1A1AA}Setup$$
 - `vomacsd init-config`: write a default config file.
 - `vomacsd init-config --force`: overwrite an existing config file.
 - `vomacsd print-default-config`: print the built-in default config JSON.
 
-$$\color{#E5E7EB}Runtime \space \color{#A1A1AA}Model$$
+$$\color{#D4D4D8}Runtime \space \color{#A1A1AA}Model$$
 - The daemon exposes a Unix socket control interface.
 - The daemon supports upload-after-recording transcription through `openai.backend = "file"`.
 - The daemon supports streamed transcription through `openai.backend = "realtime"`.
 - The daemon is designed for KDE Wayland workflows with clipboard and command hooks.
 
 ## Configuration
-$$\color{#E5E7EB}User \space \color{#A1A1AA}Config$$
+$$\color{#D4D4D8}User \space \color{#A1A1AA}Config$$
 
 - Default config path: `~/.config/vomacsd/config.json`
 - Default API key env var: `OPENAI_API_KEY`
@@ -66,7 +66,7 @@ $$\color{#E5E7EB}User \space \color{#A1A1AA}Config$$
 There is also a user-service template at `contrib/vomacsd.service`.
 
 ## Quick Start
-$$\color{#E5E7EB}Try \space \color{#A1A1AA}Daemon$$
+$$\color{#D4D4D8}Try \space \color{#A1A1AA}Daemon$$
 
 ```bash
 uv run python -m vomacsd init-config    # write the default config file
