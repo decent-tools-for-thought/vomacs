@@ -7,12 +7,14 @@ name = "vomacsd"
 version = "0.1.4"
 description = "Hookable voice transcription daemon for KDE Wayland"
 license = "0BSD"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = ["websocket-client>=1.8.0"]
 
 [dependency-groups]
 dev = [
+    "build>=1.2.2",
     "mypy>=1.19.1",
+    "pytest>=8.4.2",
     "ruff>=0.15.7",
 ]
 
@@ -27,7 +29,7 @@ package-dir = {"" = "python-src"}
 where = ["python-src"]
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py313"
 src = ["python-src", "tests"]
 
 [tool.ruff.format]
@@ -37,7 +39,7 @@ docstring-code-format = true
 select = ["E", "F", "I", "UP"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.13"
 files = ["python-src/vomacsd", "tests"]
 mypy_path = ["python-src"]
 check_untyped_defs = true
