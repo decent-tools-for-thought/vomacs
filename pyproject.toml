@@ -23,14 +23,14 @@ vomacsd = "vomacsd.cli:main"
 vomacsd-kde-helper = "vomacsd.kde_helper:main"
 
 [tool.setuptools]
-package-dir = {"" = "python-src"}
+package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
-where = ["python-src"]
+where = ["src"]
 
 [tool.ruff]
 target-version = "py313"
-src = ["python-src", "tests"]
+src = ["src", "tests"]
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -40,8 +40,8 @@ select = ["E", "F", "I", "UP"]
 
 [tool.mypy]
 python_version = "3.13"
-files = ["python-src/vomacsd", "tests"]
-mypy_path = ["python-src"]
+files = ["src/vomacsd", "tests"]
+mypy_path = ["src"]
 check_untyped_defs = true
 warn_unused_ignores = true
 warn_redundant_casts = true

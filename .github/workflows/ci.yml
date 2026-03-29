@@ -1,0 +1,15 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  quality:
+    uses: decent-tools-for-thought/.github/.github/workflows/python-package-ci.yml@main
+    with:
+      dependency_install_command: uv sync --group dev
+      mypy_target: src tests
