@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "vomacsd"
+name = "vomacs"
 version = "0.1.4"
 description = "Hookable voice transcription daemon for KDE Wayland"
 license = "0BSD"

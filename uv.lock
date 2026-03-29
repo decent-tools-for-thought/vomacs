@@ -213,7 +213,7 @@ wheels = [
 ]
 
 [[package]]
-name = "vomacsd"
+name = "vomacs"
 version = "0.1.4"
 source = { editable = "." }
 dependencies = [
