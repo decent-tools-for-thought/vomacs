@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from vomacsd.audio import pcm_chunk_size_bytes, start_pcm_stream, stop_recording
+from vomacs.audio import pcm_chunk_size_bytes, start_pcm_stream, stop_recording
 
 
 def _multipart_body(
@@ -22,7 +22,7 @@ def _multipart_body(
     fields: dict[str, str],
     files: list[tuple[str, str, bytes, str]],
 ) -> tuple[str, bytes]:
-    boundary = f"----vomacsd-{uuid.uuid4().hex}"
+    boundary = f"----vomacs-{uuid.uuid4().hex}"
     body = bytearray()
 
     for name, value in fields.items():
@@ -182,7 +182,7 @@ class RealtimeTranscriber:
 
         self._receiver_thread = threading.Thread(
             target=self._receive_loop,
-            name=f"vomacsd-realtime-recv-{self.audio_path.stem}",
+            name=f"vomacs-realtime-recv-{self.audio_path.stem}",
             daemon=True,
         )
         self._receiver_thread.start()
@@ -199,7 +199,7 @@ class RealtimeTranscriber:
         self._audio_started = True
         self._stream_thread = threading.Thread(
             target=self._stream_audio_loop,
-            name=f"vomacsd-realtime-audio-{self.audio_path.stem}",
+            name=f"vomacs-realtime-audio-{self.audio_path.stem}",
             daemon=True,
         )
         self._stream_thread.start()

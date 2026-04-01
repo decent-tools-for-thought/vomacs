@@ -12,16 +12,16 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
 
-from vomacsd import kde
-from vomacsd.audio import maybe_prepare_upload_audio, start_recording, stop_recording
-from vomacsd.config import default_socket_path, load_config, state_dir
-from vomacsd.hooks import hook_list, run_commands, run_text_filters
-from vomacsd.openai_api import (
+from vomacs import kde
+from vomacs.audio import maybe_prepare_upload_audio, start_recording, stop_recording
+from vomacs.config import default_socket_path, load_config, state_dir
+from vomacs.hooks import hook_list, run_commands, run_text_filters
+from vomacs.openai_api import (
     start_realtime_transcription,
     transcribe_file,
     transcription_backend,
 )
-from vomacsd.output import deliver_text, resolve_target
+from vomacs.output import deliver_text, resolve_target
 
 
 @dataclass
@@ -151,7 +151,7 @@ class Controller:
             self.worker = threading.Thread(
                 target=self._process_session,
                 args=(session,),
-                name=f"vomacsd-process-{session.session_id}",
+                name=f"vomacs-process-{session.session_id}",
                 daemon=True,
             )
             self.worker.start()

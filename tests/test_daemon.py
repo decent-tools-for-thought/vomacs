@@ -5,14 +5,14 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from vomacsd.config import DEFAULT_CONFIG
-from vomacsd.daemon import Controller, Session
+from vomacs.config import DEFAULT_CONFIG
+from vomacs.daemon import Controller, Session
 
 
 class DaemonTests(unittest.TestCase):
     def _controller(self) -> Controller:
         with mock.patch(
-            "vomacsd.daemon.load_config", return_value=copy.deepcopy(DEFAULT_CONFIG)
+            "vomacs.daemon.load_config", return_value=copy.deepcopy(DEFAULT_CONFIG)
         ):
             return Controller(config_path=Path("/tmp/config.json"))
 

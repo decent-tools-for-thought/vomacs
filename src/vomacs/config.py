@@ -75,19 +75,19 @@ DEFAULT_CONFIG: dict[str, Any] = {
 
 
 def config_dir() -> Path:
-    return Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "vomacsd"
+    return Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "vomacs"
 
 
 def state_dir() -> Path:
     return (
         Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
-        / "vomacsd"
+        / "vomacs"
     )
 
 
 def runtime_dir() -> Path:
-    default = Path("/tmp") / f"vomacsd-{os.getuid()}"
-    return Path(os.environ.get("XDG_RUNTIME_DIR", default)) / "vomacsd"
+    default = Path("/tmp") / f"vomacs-{os.getuid()}"
+    return Path(os.environ.get("XDG_RUNTIME_DIR", default)) / "vomacs"
 
 
 def default_config_path() -> Path:

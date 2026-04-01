@@ -4,7 +4,7 @@ import io
 import unittest
 from unittest import mock
 
-from vomacsd import output
+from vomacs import output
 
 
 class OutputTests(unittest.TestCase):
@@ -17,7 +17,7 @@ class OutputTests(unittest.TestCase):
         config = {"target": {"provider": "kde_kwin", "mode": "focused_on_finish"}}
         target = {"caption": "Editor"}
         with mock.patch(
-            "vomacsd.output.kde.query_active_window", side_effect=RuntimeError("boom")
+            "vomacs.output.kde.query_active_window", side_effect=RuntimeError("boom")
         ):
             self.assertEqual(output.resolve_target(config, target), target)
 
@@ -32,8 +32,8 @@ class OutputTests(unittest.TestCase):
 
     def test_deliver_text_clipboard_then_command_runs_both(self) -> None:
         with (
-            mock.patch("vomacsd.output._set_clipboard") as set_clipboard,
-            mock.patch("vomacsd.output._run_output_command") as run_output_command,
+            mock.patch("vomacs.output._set_clipboard") as set_clipboard,
+            mock.patch("vomacs.output._run_output_command") as run_output_command,
         ):
             output.deliver_text(
                 {"output": {"mode": "clipboard_then_command", "command": "cat"}},
@@ -52,7 +52,7 @@ class OutputTests(unittest.TestCase):
     def test_run_output_command_merges_target_env(self) -> None:
         with (
             mock.patch(
-                "vomacsd.output.kde.target_env", return_value={"VT_TARGET_UUID": "123"}
+                "vomacs.output.kde.target_env", return_value={"VT_TARGET_UUID": "123"}
             ),
             mock.patch("subprocess.run") as run,
         ):

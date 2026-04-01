@@ -1,12 +1,12 @@
 [Unit]
-Description=vomacsd voice transcription daemon
+Description=vomacs voice transcription daemon
 After=graphical-session.target
 PartOf=graphical-session.target
-Wants=vomacsd-kde-helper.service
+Wants=vomacs-kde-helper.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/vomacsd serve
+ExecStart=/usr/bin/vomacs serve
 Restart=on-failure
 RestartSec=2
 

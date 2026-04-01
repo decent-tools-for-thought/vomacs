@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from vomacsd import cli
+from vomacs import cli
 
 
 class CliTests(unittest.TestCase):
@@ -17,7 +17,7 @@ class CliTests(unittest.TestCase):
             result = cli.main([])
 
         self.assertEqual(result, 0)
-        self.assertIn("vomacsd", stdout.getvalue())
+        self.assertIn("vomacs", stdout.getvalue())
 
     def test_print_default_config_outputs_json(self) -> None:
         stdout = io.StringIO()
@@ -35,7 +35,7 @@ class CliTests(unittest.TestCase):
             with (
                 mock.patch("sys.stdout", stdout),
                 mock.patch(
-                    "vomacsd.cli.write_default_config", return_value=config_path
+                    "vomacs.cli.write_default_config", return_value=config_path
                 ) as write_default,
             ):
                 result = cli.main(
@@ -50,7 +50,7 @@ class CliTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             config_path = Path(tmpdir) / "config.json"
             socket_path = Path(tmpdir) / "control.sock"
-            with mock.patch("vomacsd.cli.serve_forever") as serve_forever:
+            with mock.patch("vomacs.cli.serve_forever") as serve_forever:
                 result = cli.main(
                     [
                         "--config",
@@ -71,7 +71,7 @@ class CliTests(unittest.TestCase):
         with (
             mock.patch("sys.stdout", stdout),
             mock.patch(
-                "vomacsd.cli._send", return_value={"ok": True, "phase": "idle"}
+                "vomacs.cli._send", return_value={"ok": True, "phase": "idle"}
             ) as send,
         ):
             result = cli.main(["status"])
@@ -84,7 +84,7 @@ class CliTests(unittest.TestCase):
         stderr = io.StringIO()
         with (
             mock.patch("sys.stderr", stderr),
-            mock.patch("vomacsd.cli._send", side_effect=FileNotFoundError),
+            mock.patch("vomacs.cli._send", side_effect=FileNotFoundError),
         ):
             result = cli.main(["status"])
 
@@ -96,7 +96,7 @@ class CliTests(unittest.TestCase):
         stderr = io.StringIO()
         with (
             mock.patch("sys.stderr", stderr),
-            mock.patch("vomacsd.cli._send", side_effect=ConnectionRefusedError),
+            mock.patch("vomacs.cli._send", side_effect=ConnectionRefusedError),
         ):
             result = cli.main(["status"])
 
@@ -107,7 +107,7 @@ class CliTests(unittest.TestCase):
         stderr = io.StringIO()
         with (
             mock.patch("sys.stderr", stderr),
-            mock.patch("vomacsd.cli._send", side_effect=PermissionError),
+            mock.patch("vomacs.cli._send", side_effect=PermissionError),
         ):
             result = cli.main(["status"])
 

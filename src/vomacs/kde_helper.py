@@ -10,13 +10,13 @@ import time
 from pathlib import Path
 from typing import Any
 
-from vomacsd.config import default_socket_path
+from vomacs.config import default_socket_path
 
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="vomacsd-kde-helper",
-        description="KDE session helper for vomacsd.",
+        prog="vomacs-kde-helper",
+        description="KDE session helper for vomacs.",
     )
     parser.add_argument("--socket", type=Path, default=default_socket_path())
     sub = parser.add_subparsers(dest="command")
@@ -53,7 +53,7 @@ def _is_kde_session(env: dict[str, str] | None = None) -> bool:
 
 
 def _notify(summary: str, body: str | None = None, *, urgency: str = "normal") -> None:
-    command = ["notify-send", "-a", "vomacsd", "-u", urgency, summary]
+    command = ["notify-send", "-a", "vomacs", "-u", urgency, summary]
     if body:
         command.append(body)
     try:
@@ -92,9 +92,9 @@ def _handle_phase_change(phase: str | None, previous_phase: str | None) -> None:
     if phase == previous_phase:
         return
     if phase == "recording":
-        _notify("vomacsd", "Recording started")
+        _notify("vomacs", "Recording started")
     elif phase == "processing":
-        _notify("vomacsd", "Transcribing")
+        _notify("vomacs", "Transcribing")
 
 
 def _handle_result_change(result: dict[str, Any] | None) -> None:
@@ -102,12 +102,12 @@ def _handle_result_change(result: dict[str, Any] | None) -> None:
         return
     status = str(result.get("status", ""))
     if status == "ok":
-        _notify("vomacsd", "Transcript delivered")
+        _notify("vomacs", "Transcript delivered")
     elif status == "cancelled":
-        _notify("vomacsd", "Recording cancelled")
+        _notify("vomacs", "Recording cancelled")
     elif status == "error":
         _notify(
-            "vomacsd",
+            "vomacs",
             str(result.get("error", "Transcription failed")),
             urgency="critical",
         )

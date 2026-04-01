@@ -4,7 +4,7 @@ import subprocess
 import unittest
 from unittest import mock
 
-from vomacsd import hooks
+from vomacs import hooks
 
 
 class HooksTests(unittest.TestCase):

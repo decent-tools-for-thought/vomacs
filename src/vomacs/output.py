@@ -4,7 +4,7 @@ import os
 import subprocess
 from typing import Any
 
-from vomacsd import kde
+from vomacs import kde
 
 
 def resolve_target(

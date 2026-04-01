@@ -1,6 +1,6 @@
 <div align="center">
 
-# vomacsd
+# vomacs
 
 [![Release](https://img.shields.io/github/v/release/decent-tools-for-thought/vomacs?sort=semver&color=c0c0c0)](https://github.com/decent-tools-for-thought/vomacs/releases)
 ![Python](https://img.shields.io/badge/python-3.11%2B-d4d4d8)
@@ -27,28 +27,28 @@ From a checkout:
 
 ```bash
 uv sync                             # install project dependencies
-uv run python -m vomacsd --help     # inspect the daemon CLI
+uv run python -m vomacs --help     # inspect the daemon CLI
 ```
 
 The packaged entry points are:
 
-- `vomacsd`
-- `vomacsd-kde-helper`
+- `vomacs`
+- `vomacs-kde-helper`
 
 ## Functionality
 $$\color{#D4D4D8}Service \space \color{#A1A1AA}Lifecycle$$
-- `vomacsd serve`: run the transcription daemon in the foreground.
-- `vomacsd start`: tell the running daemon to begin recording or transcription.
-- `vomacsd stop`: tell the running daemon to stop the current recording or transcription cycle.
-- `vomacsd toggle`: toggle the active recording state.
-- `vomacsd cancel`: cancel the current operation.
-- `vomacsd status`: fetch daemon status over the control socket.
-- `vomacsd reload`: reload daemon configuration.
+- `vomacs serve`: run the transcription daemon in the foreground.
+- `vomacs start`: tell the running daemon to begin recording or transcription.
+- `vomacs stop`: tell the running daemon to stop the current recording or transcription cycle.
+- `vomacs toggle`: toggle the active recording state.
+- `vomacs cancel`: cancel the current operation.
+- `vomacs status`: fetch daemon status over the control socket.
+- `vomacs reload`: reload daemon configuration.
 
 $$\color{#D4D4D8}Config \space \color{#A1A1AA}Setup$$
-- `vomacsd init-config`: write a default config file.
-- `vomacsd init-config --force`: overwrite an existing config file.
-- `vomacsd print-default-config`: print the built-in default config JSON.
+- `vomacs init-config`: write a default config file.
+- `vomacs init-config --force`: overwrite an existing config file.
+- `vomacs print-default-config`: print the built-in default config JSON.
 
 $$\color{#D4D4D8}Runtime \space \color{#A1A1AA}Model$$
 - The daemon exposes a Unix socket control interface.
@@ -59,24 +59,24 @@ $$\color{#D4D4D8}Runtime \space \color{#A1A1AA}Model$$
 ## Configuration
 $$\color{#D4D4D8}User \space \color{#A1A1AA}Config$$
 
-- Default config path: `~/.config/vomacsd/config.json`
+- Default config path: `~/.config/vomacs/config.json`
 - Default API key env var: `OPENAI_API_KEY`
-- Default socket path: `${XDG_RUNTIME_DIR}/vomacsd/control.sock`
+- Default socket path: `${XDG_RUNTIME_DIR}/vomacs/control.sock`
 
-There is also a user-service template at `contrib/vomacsd.service`.
+There is also a user-service template at `contrib/vomacs.service`.
 
 ## Quick Start
 $$\color{#D4D4D8}Try \space \color{#A1A1AA}Daemon$$
 
 ```bash
-uv run python -m vomacsd init-config    # write the default config file
+uv run python -m vomacs init-config    # write the default config file
 
-uv run python -m vomacsd serve          # run the daemon in the foreground
+uv run python -m vomacs serve          # run the daemon in the foreground
 
-uv run python -m vomacsd status         # inspect daemon status
-uv run python -m vomacsd start          # begin recording or transcription
-uv run python -m vomacsd stop           # stop the active capture
-uv run python -m vomacsd toggle         # toggle the active state
+uv run python -m vomacs status         # inspect daemon status
+uv run python -m vomacs start          # begin recording or transcription
+uv run python -m vomacs stop           # stop the active capture
+uv run python -m vomacs toggle         # toggle the active state
 ```
 
 ## Credits

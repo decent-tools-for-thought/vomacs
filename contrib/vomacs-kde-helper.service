@@ -1,0 +1,12 @@
+[Unit]
+Description=vomacs KDE helper
+After=vomacs.service graphical-session.target
+BindsTo=vomacs.service
+PartOf=vomacs.service graphical-session.target
+
+[Service]
+Type=simple
+ExecCondition=/usr/bin/vomacs-kde-helper check-kde-env
+ExecStart=/usr/bin/vomacs-kde-helper serve
+Restart=on-failure
+RestartSec=2

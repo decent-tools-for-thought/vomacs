@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from vomacsd import config
+from vomacs import config
 
 
 class ConfigTests(unittest.TestCase):
@@ -15,14 +15,14 @@ class ConfigTests(unittest.TestCase):
         with mock.patch.dict(
             "os.environ", {"XDG_CONFIG_HOME": "/xdg/config"}, clear=True
         ):
-            self.assertEqual(config.config_dir(), Path("/xdg/config/vomacsd"))
+            self.assertEqual(config.config_dir(), Path("/xdg/config/vomacs"))
 
     def test_config_dir_falls_back_to_home_config(self) -> None:
         with (
             mock.patch.dict("os.environ", {}, clear=True),
-            mock.patch("vomacsd.config.Path.home", return_value=Path("/home/tester")),
+            mock.patch("vomacs.config.Path.home", return_value=Path("/home/tester")),
         ):
-            self.assertEqual(config.config_dir(), Path("/home/tester/.config/vomacsd"))
+            self.assertEqual(config.config_dir(), Path("/home/tester/.config/vomacs"))
 
     def test_default_socket_path_uses_runtime_dir(self) -> None:
         with mock.patch.dict(
@@ -30,15 +30,15 @@ class ConfigTests(unittest.TestCase):
         ):
             self.assertEqual(
                 config.default_socket_path(),
-                Path("/run/user/1000/vomacsd/control.sock"),
+                Path("/run/user/1000/vomacs/control.sock"),
             )
 
     def test_runtime_dir_falls_back_to_tmp_uid(self) -> None:
         with (
             mock.patch.dict("os.environ", {}, clear=True),
-            mock.patch("vomacsd.config.os.getuid", return_value=1234),
+            mock.patch("vomacs.config.os.getuid", return_value=1234),
         ):
-            self.assertEqual(config.runtime_dir(), Path("/tmp/vomacsd-1234/vomacsd"))
+            self.assertEqual(config.runtime_dir(), Path("/tmp/vomacs-1234/vomacs"))
 
     def test_load_config_creates_default_and_merges_overrides(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -69,8 +69,8 @@ class ConfigTests(unittest.TestCase):
                 merged["openai"]["realtime"]["sample_rate_hz"],
                 config.DEFAULT_CONFIG["openai"]["realtime"]["sample_rate_hz"],
             )
-            self.assertTrue((base / "state" / "vomacsd").is_dir())
-            self.assertTrue((base / "runtime" / "vomacsd").is_dir())
+            self.assertTrue((base / "state" / "vomacs").is_dir())
+            self.assertTrue((base / "runtime" / "vomacs").is_dir())
 
     def test_load_config_writes_default_when_missing(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

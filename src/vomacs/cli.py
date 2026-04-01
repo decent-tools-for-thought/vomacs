@@ -7,20 +7,20 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from vomacsd.config import (
+from vomacs.config import (
     DEFAULT_CONFIG,
     default_config_path,
     default_socket_path,
     write_default_config,
 )
-from vomacsd.daemon import serve_forever
+from vomacs.daemon import serve_forever
 
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="vomacsd",
+        prog="vomacs",
         description=(
-            "vomacsd: hookable voice-transcription daemon for KDE Wayland.\n\n"
+            "vomacs: hookable voice-transcription daemon for KDE Wayland.\n\n"
             "OpenAI transcription model options and pricing "
             "(checked 2026-03-21):\n"
             "  gpt-4o-mini-transcribe   $0.003/minute\n"
@@ -98,7 +98,7 @@ def main(argv: list[str] | None = None) -> int:
     except FileNotFoundError:
         print(
             f"Daemon socket not found at {args.socket}. Start the daemon with "
-            f"`vomacsd --config {args.config} --socket {args.socket} serve`.",
+            f"`vomacs --config {args.config} --socket {args.socket} serve`.",
             file=sys.stderr,
         )
         return 1
